@@ -1,40 +1,40 @@
-
 import { initializeApp } from "firebase/app";
-import { 
-  getAuth, 
-  GoogleAuthProvider, 
-  signInWithPopup, 
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   onAuthStateChanged,
-  User
+  User,
 } from "firebase/auth";
-import { 
-  getFirestore, 
-  collection, 
-  doc, 
-  getDoc, 
-  setDoc, 
-  getDocs, 
-  query, 
-  where, 
+import {
+  getFirestore,
+  collection,
+  doc,
+  getDoc,
+  setDoc,
+  getDocs,
+  query,
+  where,
   orderBy,
   addDoc,
   serverTimestamp,
-  DocumentData
+  DocumentData,
 } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 // Your web app's Firebase configuration
 // Replace with your actual Firebase config
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY", // Replace this with your actual Firebase API key
-  authDomain: "campus-bite-kitchen.firebaseapp.com",
-  projectId: "campus-bite-kitchen",
-  storageBucket: "campus-bite-kitchen.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyCJl6CIOkmhN9T6MmLsgo4pjRa2KdjDPIs",
+  authDomain: "campus-kitchen-8e944.firebaseapp.com",
+  projectId: "campus-kitchen-8e944",
+  storageBucket: "campus-kitchen-8e944.firebasestorage.app",
+  messagingSenderId: "701284519523",
+  appId: "1:701284519523:web:a17b8f29cd86962b98f256",
+  measurementId: "G-95NH7K0FP2",
 };
 
 // Initialize Firebase
@@ -49,11 +49,11 @@ const signInWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
-    
+
     // Check if the user document exists
     const userDocRef = doc(db, "users", user.uid);
     const userDoc = await getDoc(userDocRef);
-    
+
     // If user doesn't exist, create a new user document
     if (!userDoc.exists()) {
       await setDoc(userDocRef, {
@@ -64,7 +64,7 @@ const signInWithGoogle = async () => {
         createdAt: serverTimestamp(),
       });
     }
-    
+
     return user;
   } catch (error) {
     console.error("Error signing in with Google: ", error);
@@ -72,11 +72,15 @@ const signInWithGoogle = async () => {
   }
 };
 
-const signUpWithEmail = async (email: string, password: string, name: string) => {
+const signUpWithEmail = async (
+  email: string,
+  password: string,
+  name: string,
+) => {
   try {
     const result = await createUserWithEmailAndPassword(auth, email, password);
     const user = result.user;
-    
+
     // Create a new user document
     await setDoc(doc(db, "users", user.uid), {
       uid: user.uid,
@@ -85,7 +89,7 @@ const signUpWithEmail = async (email: string, password: string, name: string) =>
       photoURL: null,
       createdAt: serverTimestamp(),
     });
-    
+
     return user;
   } catch (error) {
     console.error("Error signing up with email: ", error);
@@ -116,9 +120,9 @@ const signOut = async () => {
 const getMenuItems = async () => {
   try {
     const menuSnapshot = await getDocs(collection(db, "menu"));
-    return menuSnapshot.docs.map(doc => ({
+    return menuSnapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     }));
   } catch (error) {
     console.error("Error getting menu items: ", error);
@@ -135,7 +139,7 @@ const createOrder = async (userId: string, orderData: any) => {
       status: "pending",
       createdAt: serverTimestamp(),
     });
-    
+
     return orderRef.id;
   } catch (error) {
     console.error("Error creating order: ", error);
@@ -148,13 +152,13 @@ const getUserOrders = async (userId: string) => {
     const q = query(
       collection(db, "orders"),
       where("userId", "==", userId),
-      orderBy("createdAt", "desc")
+      orderBy("createdAt", "desc"),
     );
-    
+
     const ordersSnapshot = await getDocs(q);
-    return ordersSnapshot.docs.map(doc => ({
+    return ordersSnapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     }));
   } catch (error) {
     console.error("Error getting user orders: ", error);
@@ -173,7 +177,7 @@ const getCurrentUser = () => {
       },
       (error) => {
         reject(error);
-      }
+      },
     );
   });
 };
