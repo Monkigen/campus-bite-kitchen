@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,8 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
-import { db, doc, getDoc, updateDoc } from "firebase/firestore"; // Import necessary Firebase functions
-
 
 const SubscriptionPlans = () => {
   const { currentUser } = useAuth();
@@ -23,37 +22,43 @@ const SubscriptionPlans = () => {
       navigate("/auth", { state: { redirect: "/subscription" } });
       return;
     }
-
-    // Create subscription in Firestore first
-    const subscriptionData = {
-      plan,
-      days,
-      tokens,
-      price,
-      startDate: new Date().toISOString(),
-      endDate: new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString(),
-      active: true
-    };
-
-    // Add subscription and tokens to user's account
-    const userRef = doc(db, "users", currentUser.uid);
-    const userDoc = await getDoc(userRef);
-    const currentTokens = userDoc.data()?.tokens || 0;
-
-    await updateDoc(userRef, {
-      subscription: subscriptionData,
-      tokens: currentTokens + tokens,
-    });
-
-
-    toast({
-      title: "Subscription successful!",
-      description: `You have successfully subscribed to the ${plan} plan and received ${tokens} tokens.`,
-    });
-
-    navigate("/menu");
+    
+    // In a real implementation, this would redirect to a payment gateway
+    // For now, we'll simulate the subscription
+    try {
+      // Placeholder for payment processing
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Add subscription to user's account
+      // This would be replaced with actual subscription logic
+      const subscriptionData = {
+        plan,
+        days,
+        tokens,
+        price,
+        startDate: new Date().toISOString(),
+        endDate: new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString(),
+        active: true
+      };
+      
+      console.log("Subscription data:", subscriptionData);
+      
+      toast({
+        title: "Subscription successful!",
+        description: `You have successfully subscribed to the ${plan} plan and received ${tokens} tokens.`,
+      });
+      
+      navigate("/menu");
+    } catch (error) {
+      console.error("Error subscribing:", error);
+      toast({
+        title: "Subscription failed",
+        description: "There was an error processing your subscription. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
-
+  
   // Define subscription plans
   const plans = [
     {
@@ -113,7 +118,7 @@ const SubscriptionPlans = () => {
           <p className="text-campus-green font-medium">💫 Most students choose our Bi-Weekly plan for the best value!</p>
         </div>
       </div>
-
+      
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {plans.map((plan) => (
           <Card key={plan.id} className="flex flex-col hover:shadow-lg transition-shadow duration-300 border-2 hover:border-campus-green">
@@ -126,7 +131,7 @@ const SubscriptionPlans = () => {
                 <span className="text-4xl font-bold text-campus-green">₹{plan.price}</span>
                 <span className="text-gray-500 ml-1">/ {plan.days} days</span>
               </div>
-
+              
               <ul className="space-y-2">
                 {plan.features.map((feature, index) => (
                   <li key={index} className="flex items-start">
@@ -147,7 +152,7 @@ const SubscriptionPlans = () => {
           </Card>
         ))}
       </div>
-
+      
       <div className="text-center mt-8">
         <p className="text-sm text-gray-500 mb-2">
           All plans allow you to place orders before 8:10 AM and receive your meals on campus

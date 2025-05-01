@@ -36,8 +36,8 @@ const OrderQRCode: React.FC<OrderQRCodeProps> = ({ orderId, onClose }) => {
     
     if (success) {
       toast({
-        title: "Order confirmed",
-        description: "Your meal token has been redeemed. Enjoy your meal!",
+        title: "Token redeemed",
+        description: "Your meal token has been used for this order. Enjoy your meal!",
       });
       if (onClose) onClose();
     }

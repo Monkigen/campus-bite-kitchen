@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getUserOrders } from "@/lib/firebase";
@@ -104,7 +105,7 @@ const Orders = () => {
           // Normally, we'd fetch from Firebase
           // const ordersData = await getUserOrders(currentUser.uid);
           // setOrders(ordersData);
-
+          
           // For demo purposes, use sample data
           await new Promise(resolve => setTimeout(resolve, 1000));
           setOrders(sampleOrders);
@@ -198,7 +199,7 @@ const Orders = () => {
                         <span className="text-gray-500">{item.quantity}x</span>
                         <span className="ml-2">{item.name}</span>
                       </div>
-                      <span>{item.quantity} tokens</span> {/* Changed to display tokens */}
+                      <span>${(item.price * item.quantity).toFixed(2)}</span>
                     </div>
                   ))}
 
@@ -207,12 +208,20 @@ const Orders = () => {
                   {/* Order Summary */}
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm text-gray-600">
-                      <span>Items</span>
-                      <span>{order.items.length} items</span>
+                      <span>Subtotal</span>
+                      <span>${order.subtotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-gray-600">
+                      <span>Tax</span>
+                      <span>${order.tax.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-gray-600">
+                      <span>Delivery Fee</span>
+                      <span>${order.deliveryFee.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between font-medium">
-                      <span>Tokens Used</span>
-                      <span>1 token</span> {/* Placeholder - needs proper token calculation */}
+                      <span>Total</span>
+                      <span>${order.total.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
