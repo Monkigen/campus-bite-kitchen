@@ -15,15 +15,16 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
 }) => {
   return (
     <Tabs value={activeCategory} onValueChange={onChange} className="w-full">
-      <TabsList className="flex w-full overflow-x-auto pb-2 mb-6 scrollbar-hide">
-        <TabsTrigger value="all" className="rounded-full">
-          All
-        </TabsTrigger>
+      <TabsList className="flex w-full justify-center gap-4 pb-2 mb-6 scrollbar-hide">
         {categories.map((category) => (
           <TabsTrigger 
             key={category} 
             value={category}
-            className="rounded-full"
+            className={`rounded-full px-8 py-2 text-base font-medium ${
+              activeCategory === category 
+                ? "bg-campus-green text-white" 
+                : "border-2 border-campus-green text-campus-green"
+            }`}
           >
             {category}
           </TabsTrigger>
