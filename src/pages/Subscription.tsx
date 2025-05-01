@@ -109,14 +109,19 @@ const SubscriptionPlans = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-center mb-4">Choose Your Meal Plan</h1>
-      <p className="text-center text-gray-600 mb-8">
-        Subscribe to get meal tokens and enjoy campus dining with ease
+      <h1 className="text-4xl font-bold text-center mb-4">Choose Your Meal Plan</h1>
+      <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+        Select a subscription plan that fits your needs and enjoy delicious meals delivered right to your campus location
       </p>
+      <div className="max-w-sm mx-auto mb-8">
+        <div className="bg-campus-green/5 rounded-lg p-4 text-center">
+          <p className="text-campus-green font-medium">💫 Most students choose our Bi-Weekly plan for the best value!</p>
+        </div>
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {plans.map((plan) => (
-          <Card key={plan.id} className="flex flex-col">
+          <Card key={plan.id} className="flex flex-col hover:shadow-lg transition-shadow duration-300 border-2 hover:border-campus-green">
             <CardHeader>
               <CardTitle className="text-xl font-bold text-center">{plan.name}</CardTitle>
               <CardDescription className="text-center">{plan.description}</CardDescription>

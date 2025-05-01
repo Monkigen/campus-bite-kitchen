@@ -11,7 +11,7 @@ const Index = () => {
       <section className="hero-section text-white py-24 md:py-32">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 animate-fade-in">
-            Campus<span className="text-campus-orange">Bite</span> Kitchen
+            Campus<span className="text-campus-orange">Kitchen</span>
           </h1>
           <p className="text-lg md:text-xl max-w-xl mx-auto mb-8 animate-fade-in">
             Delicious, fresh meals delivered right to your dorm or campus location. No more waiting in long cafeteria lines!
