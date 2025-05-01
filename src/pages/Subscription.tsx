@@ -26,22 +26,28 @@ const SubscriptionPlans = () => {
     // In a real implementation, this would redirect to a payment gateway
     // For now, we'll simulate the subscription
     try {
-      // Placeholder for payment processing
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Simulate payment gateway redirect
+      const confirmed = window.confirm("You will be redirected to payment gateway. Continue?");
+      if (!confirmed) return;
       
-      // Add subscription to user's account
-      // This would be replaced with actual subscription logic
+      // Simulate payment processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // After successful payment, update user's subscription and tokens in Firebase
+      const userRef = doc(db, "users", currentUser.uid);
       const subscriptionData = {
         plan,
         days,
         tokens,
-        price,
         startDate: new Date().toISOString(),
         endDate: new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString(),
         active: true
       };
       
-      console.log("Subscription data:", subscriptionData);
+      await updateDoc(userRef, {
+        subscription: subscriptionData,
+        tokens: tokens // Add tokens to user's account
+      });
       
       toast({
         title: "Subscription successful!",
