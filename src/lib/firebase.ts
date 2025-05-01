@@ -1,5 +1,5 @@
 
-import { initializeApp, getApps } from "firebase/app";
+import { initializeApp } from "firebase/app";
 import { 
   getAuth, 
   GoogleAuthProvider, 
@@ -26,6 +26,9 @@ import {
 } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
+// Your web app's Firebase configuration
+// Replace with your actual Firebase config
+
 const firebaseConfig = {
   apiKey: "AIzaSyCJl6CIOkmhN9T6MmLsgo4pjRa2KdjDPIs",
   authDomain: "campus-kitchen-8e944.firebaseapp.com",
@@ -35,8 +38,8 @@ const firebaseConfig = {
   appId: "1:701284519523:web:a17b8f29cd86962b98f256",
 };
 
-// Initialize Firebase only if no apps exist
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
@@ -110,6 +113,7 @@ const signOut = async () => {
   }
 };
 
+// Menu functions
 const getMenuItems = async () => {
   try {
     const menuSnapshot = await getDocs(collection(db, "menu"));
@@ -123,6 +127,7 @@ const getMenuItems = async () => {
   }
 };
 
+// Order functions
 const createOrder = async (userId: string, orderData: any) => {
   try {
     const orderRef = await addDoc(collection(db, "orders"), {
@@ -158,6 +163,7 @@ const getUserOrders = async (userId: string) => {
   }
 };
 
+// Current user function
 const getCurrentUser = () => {
   return new Promise<User | null>((resolve, reject) => {
     const unsubscribe = onAuthStateChanged(
