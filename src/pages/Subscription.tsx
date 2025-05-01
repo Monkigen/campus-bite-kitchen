@@ -26,11 +26,27 @@ const SubscriptionPlans = () => {
     // In a real implementation, this would redirect to a payment gateway
     // For now, we'll simulate the subscription
     try {
-      // Simulate payment gateway redirect
-      const confirmed = window.confirm("You will be redirected to payment gateway. Continue?");
-      if (!confirmed) return;
+      const paymentModal = window.confirm(`
+Payment Gateway Demo
+-------------------
+Plan: ${plan}
+Tokens: ${tokens}
+Amount: ₹${price}
+
+Click OK to simulate successful payment
+Click Cancel to simulate payment failure
+      `);
       
-      // Simulate payment processing
+      if (!paymentModal) {
+        throw new Error("Payment was cancelled");
+      }
+      
+      // Simulate payment processing delay
+      toast({
+        title: "Processing payment...",
+        description: "Please wait while we process your payment",
+      });
+      
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       // After successful payment, update user's subscription and tokens in Firebase
