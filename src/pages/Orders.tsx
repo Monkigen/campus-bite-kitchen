@@ -199,7 +199,10 @@ const Orders = () => {
                         <span className="text-gray-500">{item.quantity}x</span>
                         <span className="ml-2">{item.name}</span>
                       </div>
-                      <span>${(item.price * item.quantity).toFixed(2)}</span>
+                      <span className="flex items-center">
+                        <Coins size={16} className="mr-1" />
+                        1
+                      </span>
                     </div>
                   ))}
 
@@ -207,21 +210,12 @@ const Orders = () => {
 
                   {/* Order Summary */}
                   <div className="space-y-2">
-                    <div className="flex justify-between text-sm text-gray-600">
-                      <span>Subtotal</span>
-                      <span>${order.subtotal.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm text-gray-600">
-                      <span>Tax</span>
-                      <span>${order.tax.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm text-gray-600">
-                      <span>Delivery Fee</span>
-                      <span>${order.deliveryFee.toFixed(2)}</span>
-                    </div>
                     <div className="flex justify-between font-medium">
-                      <span>Total</span>
-                      <span>${order.total.toFixed(2)}</span>
+                      <span>Total Tokens Used</span>
+                      <span className="flex items-center">
+                        <Coins size={16} className="mr-1" />
+                        {order.items.length}
+                      </span>
                     </div>
                   </div>
                 </div>
