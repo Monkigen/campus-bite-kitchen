@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import Navbar from "@/components/Navbar";
 
 import Index from "@/pages/Index";
@@ -15,6 +16,8 @@ import Cart from "@/pages/Cart";
 import Orders from "@/pages/Orders";
 import Auth from "@/pages/Auth";
 import NotFound from "@/pages/NotFound";
+import SubscriptionPlans from "@/pages/Subscription";
+import TokensPage from "@/pages/TokensPage";
 
 const queryClient = new QueryClient();
 
@@ -22,25 +25,29 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <CartProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <div className="min-h-screen flex flex-col">
-              <Navbar />
-              <main className="flex-grow">
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/menu" element={<Menu />} />
-                  <Route path="/cart" element={<Cart />} />
-                  <Route path="/orders" element={<Orders />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </main>
-            </div>
-          </BrowserRouter>
-        </TooltipProvider>
+        <SubscriptionProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <div className="min-h-screen flex flex-col">
+                <Navbar />
+                <main className="flex-grow">
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/menu" element={<Menu />} />
+                    <Route path="/cart" element={<Cart />} />
+                    <Route path="/orders" element={<Orders />} />
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/subscription" element={<SubscriptionPlans />} />
+                    <Route path="/tokens" element={<TokensPage />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </main>
+              </div>
+            </BrowserRouter>
+          </TooltipProvider>
+        </SubscriptionProvider>
       </CartProvider>
     </AuthProvider>
   </QueryClientProvider>

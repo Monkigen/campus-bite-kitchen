@@ -7,22 +7,20 @@ import { Separator } from "@/components/ui/separator";
 import CartItem from "@/components/CartItem";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { ShoppingCart, ArrowLeft, AlertCircle } from "lucide-react";
+import { useSubscription } from "@/contexts/SubscriptionContext";
+import { ShoppingCart, ArrowLeft, AlertCircle, Clock, Coins } from "lucide-react";
 import { createOrder } from "@/lib/firebase";
 import { useToast } from "@/components/ui/use-toast";
+import OrderQRCode from "@/components/OrderQRCode";
 
 const Cart = () => {
   const { cart, subtotal, clearCart } = useCart();
   const { currentUser } = useAuth();
+  const { tokens, canPlaceOrder, checkOrderTimeValidity, useToken } = useSubscription();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [processing, setProcessing] = useState(false);
-
-  const TAX_RATE = 0.08;
-  const DELIVERY_FEE = 2.99;
-
-  const tax = subtotal * TAX_RATE;
-  const total = subtotal + tax + (subtotal > 0 ? DELIVERY_FEE : 0);
+  const [completedOrder, setCompletedOrder] = useState<string | null>(null);
 
   const handleCheckout = async () => {
     if (!currentUser) {
@@ -35,6 +33,24 @@ const Cart = () => {
       return;
     }
 
+    if (!canPlaceOrder) {
+      if (tokens <= 0) {
+        toast({
+          title: "No tokens available",
+          description: "You need to subscribe to get tokens for ordering meals.",
+          variant: "destructive",
+        });
+        navigate("/subscription");
+      } else {
+        toast({
+          title: "Order time expired",
+          description: "Orders can only be placed before 8:10 AM.",
+          variant: "destructive",
+        });
+      }
+      return;
+    }
+
     try {
       setProcessing(true);
       
@@ -42,28 +58,29 @@ const Cart = () => {
       const orderData = {
         items: cart,
         subtotal,
-        tax,
-        deliveryFee: DELIVERY_FEE,
-        total,
         status: "pending",
         createdAt: new Date().toISOString(),
+        usingTokens: true,
       };
 
-      // Call Firebase function to create order
-      // In a real app, we'd use the Firebase function
-      // const orderId = await createOrder(currentUser.uid, orderData);
-      
       // For this demo, simulate the order creation
       await new Promise(resolve => setTimeout(resolve, 1500));
       const orderId = "demo-" + Math.random().toString(36).substring(2, 10);
+      
+      // Use a token for this order
+      const tokenUsed = await useToken();
+      
+      if (!tokenUsed) {
+        throw new Error("Failed to use token for this order");
+      }
       
       toast({
         title: "Order placed successfully!",
         description: `Your order #${orderId} has been placed.`,
       });
       
+      setCompletedOrder(orderId);
       clearCart();
-      navigate("/orders");
     } catch (error: any) {
       console.error("Error placing order:", error);
       toast({
@@ -75,6 +92,28 @@ const Cart = () => {
       setProcessing(false);
     }
   };
+
+  // If order is completed, show QR code
+  if (completedOrder) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-8 text-center">Order Successful!</h1>
+        <div className="max-w-md mx-auto">
+          <OrderQRCode orderId={completedOrder} />
+          <div className="mt-8 text-center">
+            <p className="mb-4 text-gray-600">
+              Your order has been placed successfully. Show this QR code to receive your meal.
+            </p>
+            <Link to="/menu">
+              <Button className="bg-campus-green hover:bg-campus-green/90">
+                Back to Menu
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -126,31 +165,45 @@ const Cart = () => {
             <CardContent>
               <div className="space-y-4">
                 <div className="flex justify-between">
-                  <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>Items in cart</span>
+                  <span>{cart.length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Tax</span>
-                  <span>${tax.toFixed(2)}</span>
+                  <span>Tokens required</span>
+                  <span>1</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Delivery Fee</span>
-                  <span>${subtotal > 0 ? DELIVERY_FEE.toFixed(2) : '0.00'}</span>
+                  <span>Your available tokens</span>
+                  <span className={tokens > 0 ? "text-campus-green font-bold" : "text-red-500 font-bold"}>
+                    {tokens}
+                  </span>
                 </div>
+                
                 <Separator />
-                <div className="flex justify-between font-semibold text-lg">
-                  <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                
+                <div className="flex items-center font-semibold">
+                  <Coins className="mr-2 h-4 w-4 text-campus-green" />
+                  <span>Pay with meal token</span>
+                </div>
+                
+                {/* Order time check */}
+                <div className="flex items-center gap-2 text-sm">
+                  <Clock className="h-4 w-4" />
+                  {checkOrderTimeValidity() ? (
+                    <span className="text-green-600">Order before 8:10 AM: Available</span>
+                  ) : (
+                    <span className="text-red-500">Order before 8:10 AM: Expired</span>
+                  )}
                 </div>
               </div>
             </CardContent>
             <CardFooter>
               <Button
                 className="w-full bg-campus-green hover:bg-campus-green/90"
-                disabled={cart.length === 0 || processing}
+                disabled={cart.length === 0 || processing || !canPlaceOrder}
                 onClick={handleCheckout}
               >
-                {processing ? "Processing..." : "Checkout"}
+                {processing ? "Processing..." : "Place Order with Token"}
               </Button>
             </CardFooter>
           </Card>
@@ -159,12 +212,39 @@ const Cart = () => {
             <div className="mt-4 flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
               <AlertCircle size={18} className="text-yellow-500 mt-0.5" />
               <div className="text-sm">
-                <p className="font-medium">You'll need to sign in before checkout.</p>
+                <p className="font-medium">You'll need to sign in before ordering.</p>
                 <p className="text-gray-600 mt-1">
                   <Link to="/auth" className="text-campus-green hover:underline">
                     Sign in
                   </Link>{" "}
                   or create an account to complete your order.
+                </p>
+              </div>
+            </div>
+          )}
+          
+          {currentUser && tokens <= 0 && cart.length > 0 && (
+            <div className="mt-4 flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+              <AlertCircle size={18} className="text-yellow-500 mt-0.5" />
+              <div className="text-sm">
+                <p className="font-medium">You don't have any meal tokens</p>
+                <p className="text-gray-600 mt-1">
+                  <Link to="/subscription" className="text-campus-green hover:underline">
+                    Subscribe to a meal plan
+                  </Link>{" "}
+                  to receive tokens for ordering.
+                </p>
+              </div>
+            </div>
+          )}
+          
+          {currentUser && tokens > 0 && !checkOrderTimeValidity() && cart.length > 0 && (
+            <div className="mt-4 flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+              <AlertCircle size={18} className="text-yellow-500 mt-0.5" />
+              <div className="text-sm">
+                <p className="font-medium">Order time has expired</p>
+                <p className="text-gray-600 mt-1">
+                  Orders can only be placed before 8:10 AM for the day's meals.
                 </p>
               </div>
             </div>
