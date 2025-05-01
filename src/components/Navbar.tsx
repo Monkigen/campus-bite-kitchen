@@ -31,6 +31,7 @@ const Navbar = () => {
     { path: "/", label: "Home" },
     { path: "/menu", label: "Menu" },
     { path: "/orders", label: "My Orders" },
+    { path: "/subscription", label: "Subscription" },
   ];
 
   const closeMobileMenu = () => {
