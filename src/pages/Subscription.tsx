@@ -30,21 +30,18 @@ const SubscriptionPlans = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Add subscription to user's account
-      const subscriptionRef = doc(db, "subscriptions", currentUser.uid);
-      await setDoc(subscriptionRef, {
+      // This would be replaced with actual subscription logic
+      const subscriptionData = {
         plan,
         days,
         tokens,
-        startDate: serverTimestamp(),
-        endDate: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
+        price,
+        startDate: new Date().toISOString(),
+        endDate: new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString(),
         active: true
-      });
-
-      // Add tokens to user's account
-      const userRef = doc(db, "users", currentUser.uid);
-      await updateDoc(userRef, {
-        tokens: increment(tokens)
-      });
+      };
+      
+      console.log("Subscription data:", subscriptionData);
       
       toast({
         title: "Subscription successful!",

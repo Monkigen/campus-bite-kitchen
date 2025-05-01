@@ -30,30 +30,16 @@ const OrderQRCode: React.FC<OrderQRCodeProps> = ({ orderId, onClose }) => {
   }, [orderId]);
   
   const handleTokenUsed = async () => {
-    try {
-      const success = await useToken();
-      
-      if (success) {
-        // Update order status
-        const orderRef = doc(db, "orders", orderId);
-        await updateDoc(orderRef, {
-          status: "delivered",
-          deliveredAt: serverTimestamp()
-        });
-
-        toast({
-          title: "Token redeemed",
-          description: "Your meal token has been used for this order. Enjoy your meal!",
-        });
-        if (onClose) onClose();
-      }
-    } catch (error) {
-      console.error("Error redeeming token:", error);
+    // This function simulates scanning the QR code and using a token
+    // In a real app, this would be done by the delivery person's scanner
+    const success = await useToken();
+    
+    if (success) {
       toast({
-        title: "Error",
-        description: "Failed to redeem token. Please try again.",
-        variant: "destructive"
+        title: "Token redeemed",
+        description: "Your meal token has been used for this order. Enjoy your meal!",
       });
+      if (onClose) onClose();
     }
   };
   
