@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 import { MealPlan } from "@/pages/Menu";
 import { useToast } from "@/components/ui/use-toast";
 import { Coins, AlertCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface MenuCardProps {
   plan: MealPlan;
@@ -14,30 +14,54 @@ interface MenuCardProps {
 
 const MenuCard: React.FC<MenuCardProps> = ({ plan }) => {
   const { addToCart } = useCart();
-  const { tokens, canPlaceOrder, checkOrderTimeValidity } = useSubscription();
+  const { subscription, tokens } = useSubscription();
   const { toast } = useToast();
 
+  // Check if user has subscription and tokens
+  if (!subscription?.active) {
+    return (
+      <Card className="w-full">
+        <CardContent className="p-6">
+          <div className="text-center">
+            <AlertCircle className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Subscribe to Order</h3>
+            <p className="text-gray-500 mb-4">
+              Get your meal subscription plan to start ordering delicious food.
+            </p>
+            <Link to="/subscription">
+              <Button className="bg-campus-green hover:bg-campus-green/90">
+                View Plans
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (tokens <= 0) {
+    return (
+      <Card className="w-full">
+        <CardContent className="p-6">
+          <div className="text-center">
+            <Coins className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No Tokens Available</h3>
+            <p className="text-gray-500 mb-4">
+              You're subscribed but need more tokens to order meals.
+            </p>
+            <Link to="/tokens">
+              <Button className="bg-campus-green hover:bg-campus-green/90">
+                Get More Tokens
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+
   const handleAddToCart = () => {
-    if (!canPlaceOrder) {
-      if (tokens <= 0) {
-        toast({
-          title: "No tokens available",
-          description: "You need to subscribe to get tokens for ordering meals.",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      if (!checkOrderTimeValidity()) {
-        toast({
-          title: "Order time expired",
-          description: "Orders can only be placed before 8:10 AM.",
-          variant: "destructive",
-        });
-        return;
-      }
-    }
-    
     addToCart({
       id: plan.id,
       name: plan.title,
@@ -46,7 +70,7 @@ const MenuCard: React.FC<MenuCardProps> = ({ plan }) => {
       category: plan.type,
       image: plan.images[0].url
     });
-    
+
     toast({
       title: "Added to cart",
       description: "This will use 1 token when you complete your order.",
@@ -81,22 +105,11 @@ const MenuCard: React.FC<MenuCardProps> = ({ plan }) => {
           <Button 
             onClick={handleAddToCart} 
             className="bg-campus-green hover:bg-campus-green/90"
-            disabled={!canPlaceOrder}
           >
             <Coins className="mr-2 h-4 w-4" /> Order with Token
           </Button>
         </div>
-        
-        {!canPlaceOrder && (
-          <div className="w-full text-sm flex items-start gap-2 bg-yellow-50 p-2 rounded-md border border-yellow-200">
-            <AlertCircle size={16} className="text-yellow-500 mt-0.5" />
-            <span>
-              {tokens <= 0 
-                ? "You need to subscribe to get tokens for ordering."
-                : "Orders can only be placed before 8:10 AM."}
-            </span>
-          </div>
-        )}
+
       </CardFooter>
     </Card>
   );
